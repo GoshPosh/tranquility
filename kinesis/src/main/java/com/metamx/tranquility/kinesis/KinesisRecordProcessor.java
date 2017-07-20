@@ -126,15 +126,8 @@ public class KinesisRecordProcessor implements IRecordProcessor {
         try {
             // For this app, we interpret the payload as UTF-8 chars.
             data = decoder.decode(record.getData()).toString();
-            String parsedString;
-            if(data.startsWith("{\"message\"")){
-                parsedString = data.substring(11,data.indexOf("@version")-2);
-            }
-            else{
-                parsedString = data;
-            }
             // Assume this record came from AmazonKinesisSample and log its age.
-            tranquilityEventWriter.send(parsedString.getBytes());
+            tranquilityEventWriter.send(data.getBytes());
         } catch (NumberFormatException e) {
             log.info("Record does not match sample record format. Ignoring record with data; " + data);
         } catch (CharacterCodingException e) {
