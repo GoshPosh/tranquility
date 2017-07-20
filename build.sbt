@@ -24,6 +24,7 @@ val scalatraVersion = "2.3.1"
 val jettyVersion = "9.2.5.v20141112"
 val apacheHttpVersion = "4.3.3"
 val kafkaVersion = "0.10.1.1"
+val KinesisClientLibraryVersion = "1.7.6"
 val airlineVersion = "0.7"
 
 def dependOnDruid(artifact: String) = {
@@ -136,6 +137,16 @@ val kafkaDependencies = Seq(
   "io.airlift" % "airline" % airlineVersion
 ) ++ loggingDependencies
 
+val kinesisDependencies = Seq(
+  "com.amazonaws" % "amazon-kinesis-client" % KinesisClientLibraryVersion
+    exclude("com.fasterxml.jackson.core", "jackson-core")
+    excludeAll(ExclusionRule(organization = "com.fasterxml.jackson.core"))
+    ,
+  "io.airlift" % "airline" % airlineVersion
+) ++ loggingDependencies
+
+dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-core" % jacksonTwoVersion
+
 val coreTestDependencies = Seq(
   "org.scalatest" %% "scalatest" % "2.2.5" % "test",
   dependOnDruid("druid-services") % "test",
@@ -172,6 +183,10 @@ val serverTestDependencies = Seq(
 )
 
 val kafkaTestDependencies = Seq(
+  "org.easymock" % "easymock" % "3.4" % "test"
+)
+
+val kinesisTestDependencies = Seq(
   "org.easymock" % "easymock" % "3.4" % "test"
 )
 
@@ -218,7 +233,7 @@ lazy val commonSettings = Seq(
 lazy val root = project.in(file("."))
   .settings(commonSettings: _*)
   .settings(publishArtifact := false)
-  .aggregate(core, flink, storm, samza, spark, server, kafka)
+  .aggregate(core, flink, storm, samza, spark, server, kafka, kinesis)
 
 lazy val core = project.in(file("core"))
   .settings(commonSettings: _*)
@@ -266,6 +281,13 @@ lazy val kafka = project.in(file("kafka"))
   .settings(publishArtifact in Test := false)
   .dependsOn(core % "test->test;compile->compile")
 
+lazy val kinesis = project.in(file("kinesis"))
+  .settings(commonSettings: _*)
+  .settings(name := "tranquility-kinesis")
+  .settings(libraryDependencies ++= (kinesisDependencies ++ kinesisTestDependencies))
+  .settings(publishArtifact in Test := false)
+  .dependsOn(core % "test->test;compile->compile")
+
 lazy val distribution = project.in(file("distribution"))
   .settings(commonSettings: _*)
   .settings(name := "tranquility-distribution")
@@ -274,4 +296,4 @@ lazy val distribution = project.in(file("distribution"))
   .settings(executableScriptName := "tranquility")
   .settings(bashScriptExtraDefines += """addJava "-Dlogback.configurationFile=${app_home}/../conf/logback.xml"""")
   .enablePlugins(JavaAppPackaging)
-  .dependsOn(kafka, server)
+  .dependsOn(kafka, server, kinesis)
