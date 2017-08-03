@@ -62,6 +62,7 @@ public class KinesisConsumer
   private final int numThreads;
   private final String appName;
   private final String streamName;
+  private final String regionName;
   private final int commitMillis;
   private final InitialPositionInStream initialPosition;
   private final TranquilityEventWriter eventWriter;
@@ -96,6 +97,7 @@ public class KinesisConsumer
     this.appName = globalConfig.getKinesisAppName();
     this.streamName = globalConfig.getKinesisStreamName();
     this.initialPosition = globalConfig.getInitialStreamPositionJava();
+    this.regionName = globalConfig.getKinesisRegionName();
     this.consumerExec = Execs.multiThreaded(numThreads, "KinesisConsumer-%d");
     workers =new ArrayList<>();
   }
@@ -125,8 +127,11 @@ public class KinesisConsumer
                         new KinesisClientLibConfiguration(appName,
                                 streamName,
                                 credentialsProvider,
-                                workerId);
-                kinesisClientLibConfiguration.withInitialPositionInStream(initialPosition);
+                                workerId)
+                                // Hardcoding region since region doesn't work with jackson 2.4
+                                .withKinesisEndpoint("kinesis."+regionName+".amazonaws.com")
+                                .withDynamoDBEndpoint("dynamodb."+regionName+".amazonaws.com")
+                                .withInitialPositionInStream(initialPosition);
 
                 IRecordProcessorFactory recordProcessorFactory = new KinesisRecordProcessorFactory(eventWriter);
 

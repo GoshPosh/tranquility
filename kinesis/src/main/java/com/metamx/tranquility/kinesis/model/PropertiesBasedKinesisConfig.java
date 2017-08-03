@@ -52,6 +52,10 @@ public abstract class PropertiesBasedKinesisConfig extends PropertiesBasedConfig
   @Config("kinesis.streamName")
   public abstract String getKinesisStreamName();
 
+  @Config("kinesis.regionName")
+  @Default("us-west-1")
+  public abstract String getKinesisRegionName();
+
   @Config("kinesis.initialStreamPosition")
   @Default("Latest")
   public abstract String getInitialStreamPosition();
