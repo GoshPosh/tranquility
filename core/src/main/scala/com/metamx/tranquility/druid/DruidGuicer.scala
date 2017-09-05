@@ -24,15 +24,7 @@ import com.google.inject.Guice
 import com.google.inject.Key
 import com.google.inject.Module
 import com.google.inject.util.Modules
-import io.druid.guice.ConfigModule
-import io.druid.guice.DruidGuiceExtensions
-import io.druid.guice.DruidSecondaryModule
-import io.druid.guice.ExtensionsConfig
-import io.druid.guice.FirehoseModule
-import io.druid.guice.JsonConfigProvider
-import io.druid.guice.LifecycleModule
-import io.druid.guice.QueryableModule
-import io.druid.guice.ServerModule
+import io.druid.guice._
 import io.druid.guice.annotations.Json
 import io.druid.guice.annotations.Self
 import io.druid.guice.annotations.Smile
@@ -41,6 +33,7 @@ import io.druid.initialization.Initialization
 import io.druid.jackson.JacksonModule
 import io.druid.server.DruidNode
 import java.util.Properties
+import io.druid.server.initialization.EmitterModule
 import scala.collection.JavaConverters._
 import scala.reflect.ClassTag
 import scala.reflect.classTag
@@ -103,7 +96,11 @@ class DruidGuicer(props: Properties)
       new LifecycleModule,
       new FirehoseModule,
       new ServerModule,
+      new DruidProcessingConfigModule,
+      new DruidProcessingModule,
       new QueryableModule,
+      new QueryRunnerFactoryModule,
+      classOf[EmitterModule],
       extensionsConfigModule
     ) map toGuiceModule
     val moreModules = Seq(
