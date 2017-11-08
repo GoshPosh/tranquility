@@ -100,6 +100,7 @@ class DruidGuicer(props: Properties)
       new DruidProcessingModule,
       new QueryableModule,
       new QueryRunnerFactoryModule,
+      new ExpressionModule,
       classOf[EmitterModule],
       extensionsConfigModule
     ) map toGuiceModule
