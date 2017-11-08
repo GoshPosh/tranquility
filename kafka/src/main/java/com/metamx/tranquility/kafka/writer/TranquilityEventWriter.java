@@ -20,8 +20,8 @@ package com.metamx.tranquility.kafka.writer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
-import com.metamx.common.logger.Logger;
-import com.metamx.common.parsers.ParseException;
+import io.druid.java.util.common.logger.Logger;
+import io.druid.java.util.common.parsers.ParseException;
 import com.metamx.tranquility.config.DataSourceConfig;
 import com.metamx.tranquility.finagle.FinagleRegistry;
 import com.metamx.tranquility.kafka.KafkaBeamUtils;
